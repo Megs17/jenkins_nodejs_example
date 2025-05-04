@@ -2,33 +2,22 @@ pipeline {
   agent {
     kubernetes {
       label 'kaniko-agent'
-      defaultContainer 'alpine'
+      defaultContainer 'kaniko'
       yaml """
 apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: alpine
-    image: alpine:3.18
-    command: ['sh', '-c', 'cat']
-    tty: true
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    command:
+    - sleep
+    args:
+    - 9999999
     volumeMounts:
-    - name: kaniko-volume
-      mountPath: /kaniko
     - name: kaniko-secret
       mountPath: /kaniko/.docker
-
-  initContainers:
-  - name: kaniko-init
-    image: gcr.io/kaniko-project/executor:latest
-    command: ['cp', '/kaniko/executor', '/kaniko/executor']
-    volumeMounts:
-    - name: kaniko-volume
-      mountPath: /kaniko
-
   volumes:
-  - name: kaniko-volume
-    emptyDir: {}
   - name: kaniko-secret
     projected:
       sources:
@@ -40,13 +29,15 @@ spec:
 
   environment {
     GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-    DOCKER_IMAGE = "megs17/myapp:\${GIT_COMMIT_SHORT}"
+    DOCKER_IMAGE = "megs17/myapp:${GIT_COMMIT_SHORT}"
   }
+  
+
 
   stages {
     stage('Checkout') {
       steps {
-        container('alpine') {
+        container('kaniko') {
           checkout scm
         }
       }
@@ -54,12 +45,11 @@ spec:
 
     stage('Build & Push with Kaniko') {
       steps {
-        container('alpine') {
+        container('kaniko') {
           sh '''
-            chmod +x /kaniko/executor
             /kaniko/executor \
-              --dockerfile=Dockerfile \
-              --context=`pwd` \
+              --context `pwd` \
+              --dockerfile `pwd`/Dockerfile \
               --destination=docker.io/$DOCKER_IMAGE \
               --cleanup
           '''
