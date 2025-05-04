@@ -10,6 +10,9 @@ spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
+    command:
+    - echo
+    tty: true
     volumeMounts:
     - name: kaniko-secret
       mountPath: /kaniko/.docker
@@ -27,13 +30,13 @@ spec:
     GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
     DOCKER_IMAGE = "megs17/myapp:${GIT_COMMIT_SHORT}"
   }
+  
+
 
   stages {
     stage('Checkout') {
       steps {
         container('kaniko') {
-          // This line keeps the container alive and allows the workspace to set up
-          sh 'echo "Starting build in kaniko container..."'
           checkout scm
         }
       }
