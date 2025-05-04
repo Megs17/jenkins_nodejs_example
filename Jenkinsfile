@@ -27,8 +27,11 @@ spec:
   }
 
   environment {
-    DOCKER_IMAGE = 'yourdockerhubusername/myapp:latest'
+    GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+    DOCKER_IMAGE = "megs17/myapp:${GIT_COMMIT_SHORT}"
   }
+  
+
 
   stages {
     stage('Checkout') {
