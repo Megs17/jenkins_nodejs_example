@@ -10,9 +10,6 @@ spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    command: ["/busybox"]
-    args: ["sleep", "3600"]
-    tty: true
     volumeMounts:
     - name: kaniko-secret
       mountPath: /kaniko/.docker
@@ -30,8 +27,6 @@ spec:
     GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
     DOCKER_IMAGE = "megs17/myapp:${GIT_COMMIT_SHORT}"
   }
-
-
 
   stages {
     stage('Checkout') {
