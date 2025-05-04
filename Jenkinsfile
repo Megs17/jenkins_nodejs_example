@@ -40,11 +40,11 @@ spec:
         container(name: 'kaniko', shell: '/busybox/sh') {
           checkout scm
           sh '''
-            /kaniko/executor \
-              --context `pwd` \
-              --dockerfile `pwd`/Dockerfile \
-              --destination=docker.io/$DOCKER_IMAGE \
-              --cleanup
+         /kaniko/executor \
+            --context `pwd` \
+            --dockerfile Dockerfile \
+            --destination=docker.io/$DOCKER_IMAGE \
+            --cleanup \
           '''
         }
       }
