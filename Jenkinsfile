@@ -11,7 +11,6 @@ spec:
     image: gcr.io/kaniko-project/executor:latest
     args:
     - "--dockerfile=Dockerfile"
-    - "--context=dir://workspace"
     - "--destination=docker.io/megs17/myapp:latest"
     - "--cleanup"
     volumeMounts:
