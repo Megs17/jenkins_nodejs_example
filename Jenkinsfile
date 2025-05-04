@@ -2,7 +2,6 @@ pipeline {
   agent {
     kubernetes {
       label 'kaniko-agent'
-      defaultContainer 'kaniko'
       yaml """
 apiVersion: v1
 kind: Pod
