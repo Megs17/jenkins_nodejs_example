@@ -42,7 +42,7 @@ spec:
           sh '''
          /kaniko/executor \
             --context `pwd` \
-            --dockerfile dockerfile \
+            --dockerfile Dockerfile \
             --destination=docker.io/$DOCKER_IMAGE \
             --cleanup \
           '''
