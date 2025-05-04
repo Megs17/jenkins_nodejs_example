@@ -32,6 +32,8 @@ spec:
     stage('Checkout') {
       steps {
         container('kaniko') {
+          // This line keeps the container alive and allows the workspace to set up
+          sh 'echo "Starting build in kaniko container..."'
           checkout scm
         }
       }
