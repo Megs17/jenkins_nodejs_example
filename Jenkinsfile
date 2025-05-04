@@ -2,17 +2,23 @@ pipeline {
   agent {
     kubernetes {
       label 'kaniko-agent'
-      defaultContainer 'kaniko'
+      defaultContainer 'alpine'
       yaml """
 apiVersion: v1
 kind: Pod
 spec:
   containers:
+  - name: alpine
+    image: alpine
+    command: ['sh', '-c', 'cat']
+    tty: true
+
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    command:
-    - echo
-    tty: true
+    args:
+      - "--dockerfile=/workspace/Dockerfile"
+      - "--context=dir:///workspace"
+      - "--destination=docker.io/megs17/myapp:latest"
     volumeMounts:
     - name: kaniko-secret
       mountPath: /kaniko/.docker
@@ -26,34 +32,32 @@ spec:
     }
   }
 
-  environment {
-    GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-    DOCKER_IMAGE = "megs17/myapp:${GIT_COMMIT_SHORT}"
-  }
-  
-
-
   stages {
     stage('Checkout') {
       steps {
-        container('kaniko') {
+        container('alpine') {
           checkout scm
         }
       }
     }
 
-    stage('Build & Push with Kaniko') {
+    stage('Build & Push') {
       steps {
-        container('kaniko') {
+        container('alpine') {
           sh '''
             /kaniko/executor \
-              --context `pwd` \
-              --dockerfile `pwd`/Dockerfile \
+              --dockerfile=Dockerfile \
+              --context=`pwd` \
               --destination=docker.io/$DOCKER_IMAGE \
               --cleanup
           '''
         }
       }
     }
+  }
+
+  environment {
+    GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+    DOCKER_IMAGE = "megs17/myapp:${GIT_COMMIT_SHORT}"
   }
 }
