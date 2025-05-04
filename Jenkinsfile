@@ -1,4 +1,4 @@
-    pipeline {
+pipeline {
  agent {
     kubernetes {
       yaml """
@@ -40,7 +40,7 @@
 
         stage('Build & Push with Kaniko') {
         steps {
-            container('kaniko', shell: '/busybox/sh') {
+            container(name: 'kaniko', shell: '/busybox/sh') {
             checkout scm
             sh '''
                 /kaniko/executor \
