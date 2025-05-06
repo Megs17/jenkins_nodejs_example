@@ -18,7 +18,7 @@ connection.connect(function(err) {
     return;
  }
 	res.send("db connection successful");
-  console.log('Connected to database.');
+  console.log('Connected to database succeded again megs.');
 
 connection.end();
 });})
