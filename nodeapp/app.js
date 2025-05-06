@@ -17,7 +17,7 @@ connection.connect(function(err) {
     console.error('Database connection failed: ' + err.stack);
     return;
  }
-	res.send("db connection successful");
+	res.send("db connection successful succeded again megs");
   console.log('Connected to database succeded again megs.');
 
 connection.end();
