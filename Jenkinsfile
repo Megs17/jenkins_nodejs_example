@@ -5,6 +5,7 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
+  serviceAccountName: ecr-access-sa 
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
@@ -13,37 +14,25 @@ spec:
     - sleep
     args:
     - "9999999"
-    volumeMounts:
-    - name: jenkins-docker-cfg
-      mountPath: /kaniko/.docker
-  volumes:
-  - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: docker-credentials
-          items:
-          - key: .dockerconfigjson
-            path: config.json
 """
     }
   }
 
   environment {
     GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-    DOCKER_IMAGE = "megs17/myapp:${GIT_COMMIT_SHORT}"
+    DOCKER_IMAGE = "891076991696.dkr.ecr.us-east-1.amazonaws.com/app:${GIT_COMMIT_SHORT}"
   }
 
   stages {
     stage('Build & Push with Kaniko') {
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
-          checkout scm
+          checkout scm   // lets Jenkins handle the checkout and enter the workspace
           sh '''
          /kaniko/executor \
             --context `pwd` \
             --dockerfile Dockerfile \
-            --destination=docker.io/$DOCKER_IMAGE \
+            --destination=$DOCKER_IMAGE \
             --cleanup \
           '''
         }
@@ -51,3 +40,6 @@ spec:
     }
   }
 }
+// kubectl create secret docker-registry docker-credentials --docker-username=[userid] --docker-password=[Docker Hub access token] --docker-email=[user email address]  
+// Uses /busybox/sh as the shell, because the base image doesn't include bash or sh by default
+
