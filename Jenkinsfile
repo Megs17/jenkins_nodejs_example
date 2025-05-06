@@ -20,7 +20,7 @@ spec:
 
   environment {
     GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-    DOCKER_IMAGE = "891076991696.dkr.ecr.us-east-1.amazonaws.com/app:${GIT_COMMIT_SHORT}"
+    DOCKER_IMAGE = "891076991696.dkr.ecr.us-east-1.amazonaws.com/app:0.1.${env.BUILD_NUMBER}"
   }
 
   stages {
